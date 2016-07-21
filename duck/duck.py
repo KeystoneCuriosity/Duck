@@ -1,4 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim()
 
 def get_country_description():
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
@@ -19,4 +22,10 @@ sparql.setQuery("""
 sparql.setReturnFormat(JSON)
 results = sparql.query().convert()
 
-print results
+for result in results["results"]["bindings"]:
+    for line in result["areas"]["value"].split(','):
+		try:
+			location = geolocator.geocode(line.strip())
+			print(location.latitude, location.longitude), line.strip()
+		except AttributeError:
+			print line.strip()
