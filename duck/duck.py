@@ -1,0 +1,1 @@
+DB_PEDIA = "http://dbpedia.org/projects/{}.rdf"
