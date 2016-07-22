@@ -80,5 +80,6 @@ def get_geonames(searchQuery):
 
 # TODO: logging?
 # logging.basicConfig()
-get_geonames('Florida')
+country = raw_input('Enter country: ')
+get_geonames(country)
 # lookupDBpedia('Florida')
