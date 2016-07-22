@@ -9,10 +9,12 @@ def states_death_ratio(wiki_url):
     if wiki_url:
         source_code = requests.get(wiki_url)
     else:
-        source_code = requests.get('https://en.wikipedia.org/wiki/Hurricane_Wilma')
+        # source_code = requests.get('https://en.wikipedia.org/wiki/Hurricane_Wilma')
+        source_code = requests.get('https://en.wikipedia.org/wiki/Hurricane_Katrina')
     soup = BeautifulSoup(source_code.content, "lxml")
 
-    table = soup.find('table', attrs={'class':'wikitable'})
+    tables = soup.find_all('table', attrs={'class':'wikitable'})
+    table = tables[1]
     rows = table.find_all('tr')
 
     data = []
@@ -21,8 +23,10 @@ def states_death_ratio(wiki_url):
         cols = [ele.text.strip() for ele in cols]
         data.append([ele for ele in cols if ele]) # Get rid of empty values
 
+
+    print(data)
     for d in data:
-        if len(d) > 0:
+        if len(d) > 1:
             mymap[d[0]] = d[1]
 
     if mymap:
@@ -77,7 +81,7 @@ def total_casualties():
     #     print (d)
 
 
-mapa1 = states_death_ratio(None)
+mapa1 = states_death_ratio("https://en.wikipedia.org/wiki/Hurricane_Katrina")
 mapa2 = us_states_population()
 
 for key in mapa1:
