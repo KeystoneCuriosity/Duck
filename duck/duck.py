@@ -7,6 +7,7 @@ import rdflib
 geolocator = Nominatim()
 _USERNAME = 'milossimic'
 sa = geonames.adapters.search.Search(_USERNAME)
+sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 
 def get_country_description():
     sparql = SPARQLWrapper("http://dbpedia.org/sparql")
@@ -19,7 +20,6 @@ def get_country_description():
     from SPARQLWrapper import SPARQLWrapper, JSON
 
 #ABSTRACT
-sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 sparql.setQuery("""
     PREFIX dbo: <http://dbpedia.org/ontology/>
     SELECT ?abstract
@@ -75,22 +75,41 @@ for result in results["results"]["bindings"]:
 		except AttributeError:
 			print line.strip()
 
-# url = 'http://api.geonames.org/search?q=Cuba&type=json&username=milossimic'
+#DEATH BY REGION AND SO ON TOTAL AMOUNT OF DAMANGE PREASSURE PEAK STRENGHT
+sparql.setQuery("""
+    PREFIX dbp: <http://dbpedia.org/property/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
-# response = urllib.urlopen(url)
-# data = json.loads(response.read())
-# print data['geonames'][0]['countryId']
+    SELECT ?pressure ?damages ?1MinWinds ?isPrimaryTopicOf ?formed ?dissipated
+    WHERE { 
+    <http://dbpedia.org/resource/Hurricane_Katrina> dbp:pressure ?pressure.
+    <http://dbpedia.org/resource/Hurricane_Katrina> dbp:damages ?damages.
+    <http://dbpedia.org/resource/Hurricane_Katrina> dbp:1MinWinds ?1MinWinds. 	
+    <http://dbpedia.org/resource/Hurricane_Katrina> foaf:isPrimaryTopicOf ?isPrimaryTopicOf.
+    <http://dbpedia.org/resource/Hurricane_Katrina> dbp:formed ?formed.
+    <http://dbpedia.org/resource/Hurricane_Katrina> dbp:dissipated ?dissipated.
 
-# provinces = 'http://sws.geonames.org/3562981/contains.rdf'
+    }
+""")
+sparql.setReturnFormat(JSON)
+rest_of_it = sparql.query().convert()
 
-# g = rdflib.Graph()
-# g.parse(provinces)
+main_data = rest_of_it['results']['bindings'][0]
+pressure = main_data['pressure']['value']
+isPrimaryTopicOf = main_data['isPrimaryTopicOf']['value']
+damages = main_data['damages']['value']
+wind = main_data['1MinWinds']['value']
+formed = main_data['formed']['value']
+dissipated = main_data['dissipated']['value']
 
-# qres = g.query(
-# 	"""
-# 	PREFIX gn:<http://www.geonames.org/ontology#>
-# 	SELECT ?name
-# 	WHERE {?x gn:name ?name}""")
+print pressure, isPrimaryTopicOf, damages, wind, formed, dissipated
 
-# for q in qres:
-# 	print q[0]
+
+
+
+
+
+
+
+
+
